@@ -27,7 +27,29 @@ services:
       generate
       -i /local/openapi.yaml
       -g typescript-axios
-      -o /local/typescript-axios
+      -o /local/generate-files/typescript-axios
+    volumes:
+      - ./:/local
+    depends_on:
+      - swagger-merge
+  openapi-generator-rust:
+    image: openapitools/openapi-generator-cli
+    command: >
+      generate
+      -i /local/openapi.yaml
+      -g rust-server
+      -o /local/generate-files/rust
+    volumes:
+      - ./:/local
+    depends_on:
+      - swagger-merge
+  openapi-generator-java:
+    image: openapitools/openapi-generator-cli
+    command: >
+      generate
+      -i /local/openapi.yaml
+      -g java
+      -o /local/generate-files/java
     volumes:
       - ./:/local
     depends_on:
