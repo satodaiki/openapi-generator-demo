@@ -1,0 +1,42 @@
+version: '2'
+
+services:
+  swagger_ui:
+    image: swaggerapi/swagger-ui
+    ports:
+      - "9010:8080"
+    volumes:
+      - ./:/local/
+    environment:
+      - SWAGGER_JSON=/local/openapi.yaml
+    depends_on:
+      - openapi-generator-typescript-axios
+  swagger_editor:
+    image: swaggerapi/swagger-editor
+    ports:
+      - "9011:8080"
+    volumes:
+      - ./:/local/
+    environment:
+      - SWAGGER_FILE=/local/openapi.yaml
+    depends_on:
+      - openapi-generator-typescript-axios
+  openapi-generator-typescript-axios:
+    image: openapitools/openapi-generator-cli
+    command: >
+      generate
+      -i /local/openapi.yaml
+      -g typescript-axios
+      -o /local/typescript-axios
+    volumes:
+      - ./:/local
+    depends_on:
+      - swagger-merge
+  swagger-merge:
+      image: node:15
+      volumes:
+        - ./:/local/
+      command: >
+        bash -c "cd /local/ &&
+        yarn global add swagger-merger &&
+        swagger-merger -i openapi/index.yaml -o openapi.yaml"
